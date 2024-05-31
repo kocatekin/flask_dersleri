@@ -14,6 +14,26 @@ Python ile sqlite kullanmak gayet kolay. `import sqlite3` diyerek gerekli kütü
 
 Sqlite içerisinde kullanabildiğimiz veri türleri NULL, INTEGER, REAL, TEXT ve BLOB. (bkz. https://www.sqlite.org/draft/datatype3.html)
 
-O halde biz `id` için INTEGER, `icerik` icin TEXT ve ayni zamanda `yapildimi` icin de TEXT kullanacağız. Normal şartlarda bu `yapildimi` alanı bir flag olacağı için BOOLEAN olacaktı, ancak elimizde BOOLEAN mevcut değil.
+O halde biz `id` için INTEGER, `icerik` icin TEXT ve ayni zamanda `yapildimi` icin de INTEGER kullanacağız. Normal şartlarda bu `yapildimi` alanı bir flag olacağı için BOOLEAN olacaktı, ancak elimizde BOOLEAN mevcut değil.
 
+O halde, bir Sqlite veritabanı oluşturan bir Python kodu yazalım.
+
+```python
+import sqlite3
+
+def db_olustur():
+  conn = sqlite3.connect("todo.db")
+  c = conn.cursor()
+  c.execute('CREATE TABLE IF NOT EXISTS todo(id INTEGER PRIMARY KEY AUTOINCREMENT, icerik TEXT NOT NULL, yapildimi INTEGER NOT NULL DEFAULT 0)')
+
+  conn.commit()
+  conn.close()
+
+if __name__ == "__main__":
+  db_olustur()
+```
+
+Şimdi kodun üstünden geçelim. İlk olarak `sqlite3` kütüphanesini ekledik. Ardından, `db_olustur()` adında bir fonksiyon tanımladık. Bu fonksiyon, `sqlite3.connect()` fonksiyonunu çağırıyor. Bu fonksiyonun içine de yaratmak istediğimiz veritabanının adını yazdık. 
+
+İlk olarak bir bağlantı oluşturuyoruz `connect()` komutuyla. Ardından, veritabanı ile iletişime geçebilmek için bir *interface* (arayüz) olan `cursor` objesini oluşturuyoruz. Veritabanı ile bağlantıyı bu obje sayesinde kuracağız. Artık örnekteki `c` objemiz bizim cursor'ımız. Ardından, bunu kullanarak veritabanına bir komut veriyoruz. Bu komut, `CREATE TABLE` komutu. Burada da gördüğümüz gibi aslında raw SQL yazmış olduk.
 
