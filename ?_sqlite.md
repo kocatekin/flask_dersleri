@@ -37,3 +37,44 @@ if __name__ == "__main__":
 
 İlk olarak bir bağlantı oluşturuyoruz `connect()` komutuyla. Ardından, veritabanı ile iletişime geçebilmek için bir *interface* (arayüz) olan `cursor` objesini oluşturuyoruz. Veritabanı ile bağlantıyı bu obje sayesinde kuracağız. Artık örnekteki `c` objemiz bizim cursor'ımız. Ardından, bunu kullanarak veritabanına bir komut veriyoruz. Bu komut, `CREATE TABLE` komutu. Burada da gördüğümüz gibi aslında raw SQL yazmış olduk.
 
+Bu programı çalıştırdıktan sonra, göreceğimiz üzere artık bir veritabanımız olacak. Bu veritabanına da bağlanıp bir şeyler yapmak istediğimizde, Flask kodumuzun içerisinde bu veritabanına aynı şekilde bağlanacak, bir cursor oluşturacak ve ardından komutlar gireceğiz.
+
+Şimdi, bu yazdığımız dosyanın içerisine birkaç tane de Todo ekleyelim. Sonra da yeni bir Python dosyası yaratıp, bu veritabanını okumayı öğreneceğiz. İleride de bunun aynısını Flask üzerinde yapacağız. 
+
+İlk yapacağımız şey, yukarıdaki koda `insert` komutları ekleyerek birkaç tane Todo yaratmak. Ardından da, yazdıklarımızı okuyalım diye yeni bir fonksiyon ekleyeceğiz.
+
+```python
+import sqlite3
+
+def db_olustur():
+  conn = sqlite3.connect("todo.db")
+  c = conn.cursor()
+  c.execute('CREATE TABLE IF NOT EXISTS todo(id INTEGER PRIMARY KEY AUTOINCREMENT, icerik TEXT NOT NULL, yapildimi INTEGER NOT NULL DEFAULT 0)')
+
+  conn.commit()
+
+  c.execute('INSERT INTO todo(icerik, yapildimi) values (?,?)', ("ekmek al", 0))
+  c.execute('INSERT INTO todo(icerik, yapildimi) values (?,?)', ("icecek al", 0))
+  conn.commit() #eger commit etmezsek, bunlar islem gormex
+  conn.close()
+
+def db_oku():
+  conn = sqlite.connect("todo.db")
+  c = conn.cursor()
+  c.execute("select * from todo")
+  rows = c.fetchall() #tum donen degerleri al
+  print(rows)
+
+
+if __name__ == "__main__":
+  db_olustur()
+  db_oku() #olusturduktan sonra o fonksiyon bitince, buna gececek.
+```
+
+Burada dikkat edilmesi gereken birkaç nokta var. Örneğin, `select` komutundan sonra bir `commit` yapmadık, çünkü aslında veritabanı üzerinde bir değişiklik yapmıyoruz. Bu yüzden o aşamada gerek yok.
+
+Bununla birlikte, bu kod *refactoring*e açık. Örneğin veritabanı adını elle veriyoruz, bunu yukarıda global bir değişken olarak verebiliriz. Ya da veritabanı bağlantısını ve cursor oluşturma işlemini iki kez yapıyoruz, keza bunu da ayrı bir fonksiyon içerisinde verebiliriz `db_baglan()` gibi. 
+
+Bunun yanısıra, `id` ile ilgili herhangi bir işlem yapmadık. Çünkü **AUTOINCREMENT** olduğu için, onu vermesek bile veritabanı onu artırıp, gerekli olan `id` atamasını yapacak.
+
+Şimdi bu kodu biraz refactor edelim, ve Flask çalışmalarına devam edelim. Final kodu repository içerisinde bulabilirsiniz.
