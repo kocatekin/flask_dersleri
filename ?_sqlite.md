@@ -14,3 +14,6 @@ Python ile sqlite kullanmak gayet kolay. `import sqlite3` diyerek gerekli kütü
 
 Sqlite içerisinde kullanabildiğimiz veri türleri NULL, INTEGER, REAL, TEXT ve BLOB. (bkz. https://www.sqlite.org/draft/datatype3.html)
 
+O halde biz `id` için INTEGER, `icerik` icin TEXT ve ayni zamanda `yapildimi` icin de TEXT kullanacağız. Normal şartlarda bu `yapildimi` alanı bir flag olacağı için BOOLEAN olacaktı, ancak elimizde BOOLEAN mevcut değil.
+
+
